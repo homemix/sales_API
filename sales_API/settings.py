@@ -14,6 +14,7 @@ from pathlib import Path
 from datetime import timedelta
 import os
 from dotenv import load_dotenv, dotenv_values
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -88,8 +89,7 @@ WSGI_APPLICATION = 'sales_API.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-print(os.getenv('DB_NAME'))
-print(os.getenv('SECRET_KEY'))
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
