@@ -45,12 +45,13 @@ class CustomerTests(APITestCase):
         customer = Customer.objects.create(user=self.user, name='John Doe', code='CUST123', phone_number='1234567890')
         url = reverse('customer-detail', kwargs={'pk': customer.id})
         data = {
+            "user": customer.id,
             'name': 'Jane Doe',
             'code': 'CUST456',
             'phone_number': '0987654321'
         }
+
         response = self.client.put(url, data, format='json')
-        print(response.status_code,response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['name'], 'Jane Doe')
 
