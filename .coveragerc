@@ -1,0 +1,19 @@
+[run]
+source =
+    customers
+    orders
+omit =
+    */tests/*
+    */migrations/*
+    */admin.py
+    */apps.py
+    */wsgi.py
+    */asgi.py
+    */__init__.py
+
+[report]
+show_missing = True
+skip_covered = False
+
+[html]
+directory = htmlcov

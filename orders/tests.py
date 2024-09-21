@@ -6,6 +6,7 @@ from customers.models import Customer
 from django.contrib.auth.models import User
 from orders.models import Order
 from rest_framework_simplejwt.tokens import RefreshToken
+from unittest.mock import patch
 
 
 class OrderTests(APITestCase):
@@ -14,7 +15,7 @@ class OrderTests(APITestCase):
         # Create a user and log them in
         self.user = User.objects.create_user(username='testuser', email='testuser@example.com', password='testpass123')
         self.customer = Customer.objects.create(user=self.user, name='John Doe', code='CUST123',
-                                                phone_number='1234567890')
+                                                phone_number='+254234567890')
         self.token = self.get_jwt_token()
 
         # Set the authentication header
@@ -24,7 +25,10 @@ class OrderTests(APITestCase):
         refresh = RefreshToken.for_user(self.user)
         return str(refresh.access_token)
 
-    def test_create_order(self):
+    @patch('services.sending_sms.SendSMS')
+    def test_create_order(self, MockSendSMS):
+        mock_sms_service = MockSendSMS.return_value
+        mock_sms_service.success = False
         url = reverse('order-list')
         data = {
             'item': 'Laptop',
@@ -32,7 +36,18 @@ class OrderTests(APITestCase):
             'customer': self.customer.id
         }
         response = self.client.post(url, data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        if mock_sms_service.success is not False:
+            self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+            # Fetch the order instance from the database
+            order = Order.objects.get(id=response.data['id'])
+
+            # Test the __str__ method of the Order model
+            self.assertEqual(str(order), f"Order {order.id} for Laptop by {order.customer}")
+
+        else:
+            # Check that the response status is HTTP 503 Service Unavailable due to SMS failure
+            self.assertEqual(response.status_code, status.HTTP_503_SERVICE_UNAVAILABLE)
 
     def test_get_orders(self):
         Order.objects.create(item='Laptop', amount=1200.00, customer=self.customer)

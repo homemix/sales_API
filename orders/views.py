@@ -34,7 +34,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         sms_service.send_message_sync()
         if sms_service.success is False:
             headers = self.get_success_headers(serializer.data)
-            return Response(serializer.data, status=status.HTTP_503_SERVICE_UNAVAILABLE, headers=headers)
+            return Response({'error':'SMS API credentials are wrong'}, status=status.HTTP_503_SERVICE_UNAVAILABLE, headers=headers)
 
         # Return the original response with the created order
         headers = self.get_success_headers(serializer.data)
