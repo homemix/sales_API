@@ -34,6 +34,12 @@ class CustomerTests(APITestCase):
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
+        # Fetch the customer instance from the database
+        customer = Customer.objects.get(id=response.data['id'])
+
+        # Test the __str__ method
+        self.assertEqual(str(customer), "John Doe")
+
     def test_get_customers(self):
         Customer.objects.create(user=self.user, name='John Doe', code='CUST123', phone_number='1234567890')
         url = reverse('customer-list')
