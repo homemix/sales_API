@@ -32,7 +32,7 @@ to any PAAS/FAAS/IAAS of your choice
 - Run the django project `python manage.py runserver 0.0.0.0:8000`
 - Make sure it runs correctly and the initial django url is visible.
 
-**The Project is also live at `http://51.210.142.16/redoc`**
+**The Project is also live at `http://sales.homemixsystems.co.ke/redoc`**
 
 # Endpoints
 - All endpoints follow the REST FRAMEWORK architecture.
