@@ -1,0 +1,60 @@
+name: Deploy Django Project
+
+on:
+  push:
+    branches:
+      - main  # Trigger deployment only when pushing to the main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+
+    - name: Install SSH Key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.VPS_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+    - name: Deploy to VPS
+      env:
+        VPS_HOST: ${{ secrets.VPS_HOST }}
+        VPS_USER: ${{ secrets.VPS_USER }}
+      run: |
+        ssh $VPS_USER@$VPS_HOST << 'EOF'
+          # Navigate to project directory or clone it if it doesn't exist
+          cd /root/sales_API || git clone https://github.com/<your-username>/<your-repo>.git /root/sales_API
+          cd /root/sales_API
+
+          # Pull the latest changes
+          git checkout main
+          git pull origin main
+
+          # Set up a virtual environment
+          python3 -m venv .venv
+          source .venv/bin/activate
+
+          # Install dependencies
+          pip install -r requirements.txt
+
+          # Set environment variables
+          #export DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}
+          
+
+          # Apply migrations and collect static files
+          python manage.py migrate
+          python manage.py collectstatic --noinput
+
+          # Restart Gunicorn and Nginx
+          sudo systemctl restart gunicorn
+          sudo systemctl restart nginx
+        EOF
