@@ -36,4 +36,4 @@ to any PAAS/FAAS/IAAS of your choice
 
 # Endpoints
 - All endpoints follow the REST FRAMEWORK architecture.
-- Visit `http://51.210.142.16/swagger/` or `http://51.210.142.16/redoc/` for the complete list of Endpoints and testing.
+- Visit `http://sales.homemixsystems.co.ke/swagger/` or `http://sales.homemixsystems.co.ke/redoc/` for the complete list of Endpoints and testing.
