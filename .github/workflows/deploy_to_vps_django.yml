@@ -27,18 +27,21 @@ jobs:
         VPS_HOST: ${{ secrets.VPS_HOST }}
         VPS_USER: ${{ secrets.VPS_USER }}
         VPS_PASSWORD: ${{ secrets.VPS_PASSWORD }}
-        VPS_PAT: ${{ secrets.VPS_PAT }}
+        GITHUB_PAT: ${{ secrets.VPS_PAT }}
       run: |
         sshpass -p "$VPS_PASSWORD" ssh -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST << 'EOF'
-          # Clone or navigate to the project directory
-          cd /root/sales_API || {
-            git clone https://${VPS_PAT}@github.com/homemix/sales_API.git /root/sales_API
+          # Navigate to project directory or clone it if not exists
+          if [ -d "/root/sales_API" ]; then
             cd /root/sales_API
-          }
 
-          # Pull the latest changes
-          git checkout main
-          git pull origin main
+            # Reset local changes and pull the latest updates
+            git reset --hard  # Discard any local changes
+            git clean -fd     # Remove untracked files and directories
+            git pull origin main
+          else
+            git clone https://${GITHUB_PAT}@github.com/<your-username>/<your-repo>.git /root/sales_API
+            cd /root/sales_API
+          fi
 
           # Set up virtual environment
           python3 -m venv .venv
