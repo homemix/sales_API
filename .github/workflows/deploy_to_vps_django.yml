@@ -11,12 +11,12 @@ jobs:
 
     steps:
     - name: Checkout Code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: 3.9
+        python-version: '3.x'
 
     - name: Install SSH Key
       run: |
@@ -32,7 +32,7 @@ jobs:
       run: |
         ssh $VPS_USER@$VPS_HOST << 'EOF'
           # Navigate to project directory or clone it if it doesn't exist
-          cd /root/sales_API || git clone https://github.com/<your-username>/<your-repo>.git /root/sales_API
+          cd /root/sales_API || git clone https://github.com/homemix/sales_API.git /root/sales_API
           cd /root/sales_API
 
           # Pull the latest changes
